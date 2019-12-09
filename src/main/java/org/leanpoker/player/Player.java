@@ -43,9 +43,9 @@ public class Player {
 
         // LOGIC STARTS HERE ------------------------------------------------------------------
 
-        if (checkForAllOut(players)) {
-            return selfStack;
-        }
+//        if (checkForAllOut(players)) {
+//            return selfStack;
+//        }
 
         if (allCards.size() > 2) {
             if (countSameValues(selfCards, allCards)[0] == 4) {
