@@ -6,7 +6,7 @@ import java.util.Map;
 
 public class Player {
 
-    static final String VERSION = "Default Java folding player";
+    static final String VERSION = "init 1.0 commit almafa";
 
     public static int betRequest(JsonElement request) {
         return 0;
