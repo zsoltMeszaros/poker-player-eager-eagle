@@ -74,7 +74,7 @@ public class Player {
             }
         }
 
-        if (getHandSum(getHandsValueList(selfCards)) > 20) {
+        if (getHandSum(getHandsValueList(selfCards)) > 18) {
             if (currentBuyIn < 50) {
                 return currentBuyIn - selfBet;
             }
@@ -99,6 +99,10 @@ public class Player {
             if (counter > max) max = counter;
         }
         return max;
+    }
+
+    public static boolean checkForDoublePair(JsonObject[] selfHand, List<JsonObject> allCards) {
+        return true;
     }
 
     public static boolean checkPair(JsonObject[] selfHand) {
