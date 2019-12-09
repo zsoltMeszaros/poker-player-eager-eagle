@@ -60,14 +60,10 @@ public class Player {
                 return selfStack / 5;
             } else if (countSameValues(selfCards, allCards)[0] == 2) {
                 if (countSameValues(selfCards, allCards)[1] > 10) {
-                    if (currentBuyIn <= 30) {
-                        return currentBuyIn - selfBet;
-                    } else {
-                        return 0;
-                    }
-                } else {
-                    return 0;
+                    return currentBuyIn - selfBet;
                 }
+            } else {
+                return 0;
             }
         }
 
@@ -79,7 +75,7 @@ public class Player {
 
         if (allCards.size() == 2) {
             if (checkPair(selfCards) && getHighestInHand(getHandsValueList(selfCards)) > 11) {
-                return currentBuyIn - selfBet + 80;
+                return currentBuyIn - selfBet;
             }
 
             if (checkMatchingSuit(selfCards) && currentBuyIn <= 50) {
@@ -87,13 +83,12 @@ public class Player {
             }
 
             if (checkPair(selfCards) && getHighestInHand(getHandsValueList(selfCards)) <= 11) {
-                if (currentBuyIn < 40) {
-                    return currentBuyIn - selfBet;
-                }
+                if (currentBuyIn < (selfStack / 4))
+                return currentBuyIn - selfBet;
             }
 
             if (getHandSum(getHandsValueList(selfCards)) > 18) {
-                if (currentBuyIn < 25) {
+                if (currentBuyIn < (selfStack / 5)) {
                     return currentBuyIn - selfBet;
                 }
             }
