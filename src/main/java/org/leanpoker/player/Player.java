@@ -9,7 +9,7 @@ public class Player {
 
     private static Gson gson = new Gson();
 
-    static final String VERSION = "3.2";
+    static final String VERSION = "3.2a";
 
     public static int betRequest(JsonElement request) {
 
