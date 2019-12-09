@@ -9,7 +9,7 @@ public class Player {
 
     private static Gson gson = new Gson();
 
-    static final String VERSION = "2.1";
+    static final String VERSION = "2.2";
 
     public static int betRequest(JsonElement request) {
 
@@ -43,19 +43,27 @@ public class Player {
         // LOGIC STARTS HERE ------------------------------------------------------------------
 
         if (allCards.size() > 2) {
-           if (countSameValues(selfCards, allCards) == 4) {
-               return selfStack;
-           } else if (checkForDoublePair(selfCards, allCards) == 5) {
-               return selfStack;
-           } else if (countSameSuit(allCards) >= 5) {
-               return selfStack / 2;
-           } else if (countSameValues(selfCards, allCards) == 3) {
-               return selfStack / 4;
-           } else if (checkForDoublePair(selfCards, allCards) == 4) {
-               return selfStack / 5;
-           } else if (countSameValues(selfCards, allCards) == 2 && currentBuyIn < 75) {
-               return currentBuyIn - selfBet;
-           }
+            if (countSameValues(selfCards, allCards)[0] == 4) {
+                return selfStack;
+            } else if (checkForDoublePair(selfCards, allCards) == 5) {
+                return selfStack;
+            } else if (countSameSuit(allCards) >= 5) {
+                return selfStack / 2;
+            } else if (countSameValues(selfCards, allCards)[0] == 3) {
+                return selfStack / 4;
+            } else if (checkForDoublePair(selfCards, allCards) == 4) {
+                return selfStack / 5;
+            } else if (countSameValues(selfCards, allCards)[0] == 2) {
+                if (countSameValues(selfCards, allCards)[1] > 10) {
+                    if (currentBuyIn <= 50) {
+                        return currentBuyIn - selfBet;
+                    } else {
+                        return 0;
+                    }
+                } else {
+                    return 0;
+                }
+            }
         }
 
         if (allCards.size() > 5) {
@@ -64,23 +72,25 @@ public class Player {
             }
         }
 
-        if (checkPair(selfCards) && getHighestInHand(getHandsValueList(selfCards)) > 11) {
-            return currentBuyIn - selfBet + 100;
-        }
+        if (allCards.size() == 2) {
+            if (checkPair(selfCards) && getHighestInHand(getHandsValueList(selfCards)) > 11) {
+                return currentBuyIn - selfBet + 100;
+            }
 
-        if (checkMatchingSuit(selfCards) && currentBuyIn <= 100) {
-            return currentBuyIn - selfBet;
-        }
-
-        if (checkPair(selfCards) && getHighestInHand(getHandsValueList(selfCards)) <= 11) {
-            if (currentBuyIn < 75) {
+            if (checkMatchingSuit(selfCards) && currentBuyIn <= 100) {
                 return currentBuyIn - selfBet;
             }
-        }
 
-        if (getHandSum(getHandsValueList(selfCards)) > 18) {
-            if (currentBuyIn < 50) {
-                return currentBuyIn - selfBet;
+            if (checkPair(selfCards) && getHighestInHand(getHandsValueList(selfCards)) <= 11) {
+                if (currentBuyIn < 75) {
+                    return currentBuyIn - selfBet;
+                }
+            }
+
+            if (getHandSum(getHandsValueList(selfCards)) > 18) {
+                if (currentBuyIn < 50) {
+                    return currentBuyIn - selfBet;
+                }
             }
         }
 
@@ -91,8 +101,10 @@ public class Player {
 
     }
 
-    public static int countSameValues(JsonObject[] selfHand, List<JsonObject> allCards) {
+    public static int[] countSameValues(JsonObject[] selfHand, List<JsonObject> allCards) {
         int max = 0;
+        int valueOfMax = 0;
+
         for (JsonObject ownCard : selfHand) {
             int counter = 0;
             for (JsonObject card : allCards) {
@@ -100,9 +112,27 @@ public class Player {
                     counter++;
                 }
             }
-            if (counter > max) max = counter;
+            if (counter > max) {
+                max = counter;
+                switch (ownCard.get("rank").getAsString()) {
+                    case "J":
+                        valueOfMax = 11;
+                        break;
+                    case "Q":
+                        valueOfMax = 12;
+                        break;
+                    case "K":
+                        valueOfMax = 13;
+                        break;
+                    case "A":
+                        valueOfMax = 14;
+                        break;
+                    default:
+                        valueOfMax = ownCard.get("rank").getAsInt();
+                }
+            }
         }
-        return max;
+        return new int[]{max, valueOfMax};
     }
 
     public static int checkForDoublePair(JsonObject[] selfHand, List<JsonObject> allCards) {
@@ -129,7 +159,7 @@ public class Player {
 
     public static int countSameSuit(List<JsonObject> allCards) {
         int max = 0;
-        List<String> suitsList= new ArrayList<>();
+        List<String> suitsList = new ArrayList<>();
         suitsList.add("clubs");
         suitsList.add("spades");
         suitsList.add("hearts");
