@@ -9,7 +9,7 @@ public class Player {
 
     private static Gson gson = new Gson();
 
-    static final String VERSION = "2.0";
+    static final String VERSION = "2.1";
 
     public static int betRequest(JsonElement request) {
 
@@ -45,11 +45,15 @@ public class Player {
         if (allCards.size() > 2) {
            if (countSameValues(selfCards, allCards) == 4) {
                return selfStack;
-           } else if (countSameSuit(allCards) >= 5) {
+           } else if (checkForDoublePair(selfCards, allCards) == 5) {
                return selfStack;
+           } else if (countSameSuit(allCards) >= 5) {
+               return selfStack / 2;
            } else if (countSameValues(selfCards, allCards) == 3) {
                return selfStack / 4;
-           }else if (countSameValues(selfCards, allCards) == 2 && currentBuyIn < 75) {
+           } else if (checkForDoublePair(selfCards, allCards) == 4) {
+               return selfStack / 5;
+           } else if (countSameValues(selfCards, allCards) == 2 && currentBuyIn < 75) {
                return currentBuyIn - selfBet;
            }
         }
@@ -101,8 +105,18 @@ public class Player {
         return max;
     }
 
-    public static boolean checkForDoublePair(JsonObject[] selfHand, List<JsonObject> allCards) {
-        return true;
+    public static int checkForDoublePair(JsonObject[] selfHand, List<JsonObject> allCards) {
+        int[] result = new int[2];
+        for (int i = 0; i < 2; i++) {
+            int counter = 0;
+            for (JsonObject card : allCards) {
+                if (selfHand[i].get("rank").getAsString().equals(card.get("rank").getAsString())) {
+                    counter++;
+                }
+            }
+            result[i] = counter;
+        }
+        return result[0] + result[1];
     }
 
     public static boolean checkPair(JsonObject[] selfHand) {
