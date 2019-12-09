@@ -1,9 +1,6 @@
 package org.leanpoker.player;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,19 +10,22 @@ public class Player {
 
     private static Gson gson = new Gson();
 
-    static final String VERSION = "1.1.1";
+    static final String VERSION = "1.1.2";
 
     public static int betRequest(JsonElement request) {
 
         JsonObject jsonObject = request.getAsJsonObject();
 
         int inAction = jsonObject.get("in_action").getAsInt();
-
-
         JsonElement self = jsonObject.get("players").getAsJsonArray().get(inAction);
+        JsonArray cards = self.getAsJsonObject().get("hole_cards").getAsJsonArray();
+        JsonObject[] selfCards = new JsonObject[2];
+        for (int i = 0; i < selfCards.length; i++) {
+            selfCards[i] = cards.get(i).getAsJsonObject();
+        }
 
 
-        System.out.println(self);
+
 
         return 0;
     }
