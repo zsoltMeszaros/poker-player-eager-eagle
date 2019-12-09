@@ -2,10 +2,7 @@ package org.leanpoker.player;
 
 import com.google.gson.*;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Player {
 
@@ -36,34 +33,46 @@ public class Player {
 
         int selfBet = self.get("bet").getAsInt();
 
-        if (checkPair(selfCards)) {
-            if (getHighestInHand(selfCards) >= 10) {
-                if (currentBuyIn <= 80) {
-                    return currentBuyIn - selfBet + minimumRaise + 100;
-                } else {
-                    return currentBuyIn;
-                }
-            } else {
-                if (currentBuyIn <= 80) {
-                    return currentBuyIn;
-                } else {
-                    return 0;
-                }
-            }
-        } else {
-            if (getHighestInHand(selfCards) >= 10) {
-                if (currentBuyIn <= 50) {
-                    return currentBuyIn;
-                } else {
-                    return 0;
-                }
-            } else {
-                return 0;
-            }
+        List<JsonObject> allCards = new ArrayList<>(Arrays.asList(selfCards));
+        for (JsonElement card : communityCards) {
+            allCards.add(card.getAsJsonObject());
         }
+
+        if (checkPair(selfCards) && getHighestInHand(selfCards) > 10) {
+            return currentBuyIn - selfBet;
+        }
+
+        return 0;
+
+//        if (checkPair(selfCards)) {
+//            if (getHighestInHand(selfCards) >= 10) {
+//                if (currentBuyIn <= 80) {
+//                    return currentBuyIn - selfBet + minimumRaise + 100;
+//                } else {
+//                    return currentBuyIn;
+//                }
+//            } else {
+//                if (currentBuyIn <= 80) {
+//                    return currentBuyIn;
+//                } else {
+//                    return 0;
+//                }
+//            }
+//        } else {
+//            if (getHighestInHand(selfCards) >= 10) {
+//                if (currentBuyIn <= 50) {
+//                    return currentBuyIn;
+//                } else {
+//                    return 0;
+//                }
+//            } else {
+//                return 0;
+//            }
+//        }
 }
 
     public static void showdown(JsonElement game) {
+
     }
 
     public static boolean checkPair(JsonObject[] selfHand) {
