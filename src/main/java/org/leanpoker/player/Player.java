@@ -2,13 +2,14 @@ package org.leanpoker.player;
 
 import com.google.gson.*;
 
+import javax.swing.*;
 import java.util.*;
 
 public class Player {
 
     private static Gson gson = new Gson();
 
-    static final String VERSION = "1.3";
+    static final String VERSION = "1.4";
 
     public static int betRequest(JsonElement request) {
 
@@ -39,19 +40,19 @@ public class Player {
             allCards.add(card.getAsJsonObject());
         }
 
-        if (allCards.size() == 5) {
-            if (countSameSuit(allCards) == 4 && currentBuyIn < 300) {
-                return currentBuyIn - selfBet;
-            }
-        }
-
         if (allCards.size() > 2) {
            if (countSameSuit(allCards) >= 5) {
                return selfStack;
            }
         }
 
-        if (checkPair(selfCards) && getHighestInHand(selfCards) > 11) {
+        if (allCards.size() > 5) {
+            if (countSameSuit(allCards) < 5) {
+                return 0;
+            }
+        }
+
+        if (checkPair(selfCards) && getHighestInHand(getHandsValueList(selfCards)) > 11) {
             return selfStack;
         }
 
@@ -59,34 +60,17 @@ public class Player {
             return currentBuyIn - selfBet;
         }
 
+//        if (checkPair(selfCards) && getHighestInHand(getHandsValueList(selfCards)) <= 11) {
+//
+//        }
+
+        if (getHandSum(getHandsValueList(selfCards)) > 20) {
+            if (currentBuyIn < 100) {
+                return currentBuyIn - selfBet;
+            }
+        }
 
         return 0;
-
-//        if (checkPair(selfCards)) {
-//            if (getHighestInHand(selfCards) >= 10) {
-//                if (currentBuyIn <= 80) {
-//                    return currentBuyIn - selfBet + minimumRaise + 100;
-//                } else {
-//                    return currentBuyIn;
-//                }
-//            } else {
-//                if (currentBuyIn <= 80) {
-//                    return currentBuyIn;
-//                } else {
-//                    return 0;
-//                }
-//            }
-//        } else {
-//            if (getHighestInHand(selfCards) >= 10) {
-//                if (currentBuyIn <= 50) {
-//                    return currentBuyIn;
-//                } else {
-//                    return 0;
-//                }
-//            } else {
-//                return 0;
-//            }
-//        }
     }
 
     public static void showdown(JsonElement game) {
@@ -122,7 +106,7 @@ public class Player {
         return max;
     }
 
-    public static int getHighestInHand(JsonObject[] selfHand) {
+    public static List<Integer> getHandsValueList(JsonObject[] selfHand) {
         List<Integer> cardsList = new ArrayList<>();
         for (JsonObject card : selfHand) {
             int value;
@@ -145,38 +129,15 @@ public class Player {
             cardsList.add(value);
         }
 
-        return Collections.max(cardsList);
+        return cardsList;
     }
 
-    public static int firstRound(int round, int selfBet, int currentBuyIn, int minimumRaise, JsonObject[] selfCards) {
-        if (round == 0) {
-            if (checkPair(selfCards)) {
-                if (getHighestInHand(selfCards) >= 10) {
-                    if (currentBuyIn <= 80) {
-                        return currentBuyIn - selfBet + minimumRaise + 100;
-                    } else {
-                        return currentBuyIn;
-                    }
-                } else {
-                    if (currentBuyIn <= 80) {
-                        return currentBuyIn;
-                    } else {
-                        return 0;
-                    }
-                }
-            } else {
-                if (getHighestInHand(selfCards) >= 10) {
-                    if (currentBuyIn <= 50) {
-                        return currentBuyIn;
-                    } else {
-                        return 0;
-                    }
-                } else {
-                    return 0;
-                }
-            }
-        }
-        return 0;
+    public static int getHandSum(List<Integer> cardsValues) {
+        return cardsValues.stream().mapToInt(Integer::intValue).sum();
+    }
+
+    public static int getHighestInHand(List<Integer> cardsValues) {
+        return Collections.max(cardsValues);
     }
 
     public static void main(String[] args) {
