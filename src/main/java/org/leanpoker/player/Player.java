@@ -9,7 +9,7 @@ public class Player {
 
     private static Gson gson = new Gson();
 
-    static final String VERSION = "3.1";
+    static final String VERSION = "3.2";
 
     public static int betRequest(JsonElement request) {
 
@@ -60,13 +60,7 @@ public class Player {
                 return selfStack / 5;
             } else if (countSameValues(selfCards, allCards)[0] == 2) {
                 if (countSameValues(selfCards, allCards)[1] > 10) {
-                    if (currentBuyIn <= 80) {
-                        return currentBuyIn - selfBet;
-                    } else {
-                        return 0;
-                    }
-                } else {
-                    return 0;
+                    return currentBuyIn - selfBet + 100;
                 }
             } else if (getHandSum(getHandsValueList(selfCards)) > 18)) {
                 if (currentBuyIn <= 30) {
@@ -103,7 +97,7 @@ public class Player {
             }
         }
 
-        return 0;
+        return 30;
     }
 
     public static void showdown(JsonElement game) {
