@@ -9,7 +9,7 @@ public class Player {
 
     private static Gson gson = new Gson();
 
-    static final String VERSION = "1.4.5";
+    static final String VERSION = "1.4.5a";
 
     public static int betRequest(JsonElement request) {
 
@@ -67,7 +67,7 @@ public class Player {
         }
 
         if (getHandSum(getHandsValueList(selfCards)) > 20) {
-            if (currentBuyIn < 100) {
+            if (currentBuyIn < 50) {
                 return currentBuyIn - selfBet;
             }
         }
