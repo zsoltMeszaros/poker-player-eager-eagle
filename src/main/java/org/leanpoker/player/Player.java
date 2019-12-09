@@ -8,7 +8,7 @@ public class Player {
 
     private static Gson gson = new Gson();
 
-    static final String VERSION = "1.2.3";
+    static final String VERSION = "1.3";
 
     public static int betRequest(JsonElement request) {
 
@@ -39,9 +39,26 @@ public class Player {
             allCards.add(card.getAsJsonObject());
         }
 
+        if (allCards.size() == 5) {
+            if (countSameSuit(allCards) == 4 && currentBuyIn < 300) {
+                return currentBuyIn - selfBet;
+            }
+        }
+
+        if (allCards.size() > 2) {
+           if (countSameSuit(allCards) >= 5) {
+               return selfStack;
+           }
+        }
+
         if (checkPair(selfCards) && getHighestInHand(selfCards) > 11) {
             return selfStack;
         }
+
+        if (checkMatchingSuit(selfCards) && currentBuyIn <= 100) {
+            return currentBuyIn - selfBet;
+        }
+
 
         return 0;
 
@@ -70,7 +87,7 @@ public class Player {
 //                return 0;
 //            }
 //        }
-}
+    }
 
     public static void showdown(JsonElement game) {
 
@@ -78,6 +95,31 @@ public class Player {
 
     public static boolean checkPair(JsonObject[] selfHand) {
         return selfHand[0].get("rank").equals(selfHand[1].get("rank"));
+    }
+
+    public static boolean checkMatchingSuit(JsonObject[] selfHand) {
+        return selfHand[0].get("suit").equals(selfHand[1].get("suit"));
+    }
+
+    public static int countSameSuit(List<JsonObject> allCards) {
+        int max = 0;
+        List<String> suitsList= new ArrayList<>();
+        suitsList.add("clubs");
+        suitsList.add("spades");
+        suitsList.add("hearts");
+        suitsList.add("diamonds");
+
+        for (String suit : suitsList) {
+            int count = 0;
+            for (JsonObject card : allCards) {
+                if (card.get("suit").getAsString().equals(suit)) {
+                    count++;
+                }
+            }
+            if (count > max) max = count;
+        }
+
+        return max;
     }
 
     public static int getHighestInHand(JsonObject[] selfHand) {
