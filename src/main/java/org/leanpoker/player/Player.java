@@ -9,7 +9,7 @@ public class Player {
 
     private static Gson gson = new Gson();
 
-    static final String VERSION = "3.2a";
+    static final String VERSION = "2.2";
 
     public static int betRequest(JsonElement request) {
 
@@ -23,7 +23,6 @@ public class Player {
         JsonArray communityCards = jsonObject.get("community_cards").getAsJsonArray();
 
         int inAction = jsonObject.get("in_action").getAsInt();
-        JsonArray players = jsonObject.get("players").getAsJsonArray();
         JsonObject self = jsonObject.get("players").getAsJsonArray().get(inAction).getAsJsonObject();
         JsonArray cards = self.get("hole_cards").getAsJsonArray();
         int selfStack = self.get("stack").getAsInt();
@@ -43,10 +42,6 @@ public class Player {
 
         // LOGIC STARTS HERE ------------------------------------------------------------------
 
-//        if (checkForAllOut(players)) {
-//            return selfStack;
-//        }
-
         if (allCards.size() > 2) {
             if (countSameValues(selfCards, allCards)[0] == 4) {
                 return selfStack;
@@ -60,11 +55,13 @@ public class Player {
                 return selfStack / 5;
             } else if (countSameValues(selfCards, allCards)[0] == 2) {
                 if (countSameValues(selfCards, allCards)[1] > 10) {
-                    return currentBuyIn - selfBet + 100;
-                }
-            } else if (getHandSum(getHandsValueList(selfCards)) > 18) {
-                if (currentBuyIn <= 30) {
-                    return currentBuyIn - selfBet;
+                    if (currentBuyIn <= 50) {
+                        return currentBuyIn - selfBet;
+                    } else {
+                        return 0;
+                    }
+                } else {
+                    return 0;
                 }
             }
         }
@@ -77,15 +74,15 @@ public class Player {
 
         if (allCards.size() == 2) {
             if (checkPair(selfCards) && getHighestInHand(getHandsValueList(selfCards)) > 11) {
-                return currentBuyIn - selfBet + 80;
+                return currentBuyIn - selfBet + 100;
             }
 
-            if (checkMatchingSuit(selfCards) && currentBuyIn <= 75) {
+            if (checkMatchingSuit(selfCards) && currentBuyIn <= 100) {
                 return currentBuyIn - selfBet;
             }
 
             if (checkPair(selfCards) && getHighestInHand(getHandsValueList(selfCards)) <= 11) {
-                if (currentBuyIn < 60) {
+                if (currentBuyIn < 75) {
                     return currentBuyIn - selfBet;
                 }
             }
@@ -97,7 +94,7 @@ public class Player {
             }
         }
 
-        return 30;
+        return 0;
     }
 
     public static void showdown(JsonElement game) {
@@ -213,16 +210,6 @@ public class Player {
 
     public static int getHighestInHand(List<Integer> cardsValues) {
         return Collections.max(cardsValues);
-    }
-
-    public static boolean checkForAllOut(JsonArray players) {
-        int counter = 0;
-        for (JsonElement player : players) {
-            if (player.getAsJsonObject().get("status").getAsString().equals("out")) {
-                counter++;
-            }
-        }
-        return counter == 4;
     }
 
     public static void main(String[] args) {
