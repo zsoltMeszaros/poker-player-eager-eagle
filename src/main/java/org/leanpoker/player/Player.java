@@ -8,7 +8,12 @@ public class Player {
 
     static final String VERSION = "init 1.0 commit almafa";
 
+
+
     public static int betRequest(JsonElement request) {
+
+        System.out.println(request);
+
         return 0;
     }
 
