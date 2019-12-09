@@ -9,7 +9,7 @@ public class Player {
 
     private static Gson gson = new Gson();
 
-    static final String VERSION = "4.0";
+    static final String VERSION = "4.1";
 
     public static int betRequest(JsonElement request) {
 
@@ -59,6 +59,9 @@ public class Player {
             } else if (checkForDoublePair(selfCards, allCards) == 4) {
                 return selfStack / 5;
             } else if (countSameValues(selfCards, allCards)[0] == 2) {
+                if (countSameValues(selfCards, allCards)[1] > 12) {
+                    return selfStack / 5;
+                }
                 if (countSameValues(selfCards, allCards)[1] > 10) {
                     return currentBuyIn - selfBet;
                 }
