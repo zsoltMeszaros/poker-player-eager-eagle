@@ -62,7 +62,7 @@ public class Player {
                 if (countSameValues(selfCards, allCards)[1] > 10) {
                     return currentBuyIn - selfBet + 100;
                 }
-            } else if (getHandSum(getHandsValueList(selfCards)) > 18)) {
+            } else if (getHandSum(getHandsValueList(selfCards)) > 18) {
                 if (currentBuyIn <= 30) {
                     return currentBuyIn - selfBet;
                 }
