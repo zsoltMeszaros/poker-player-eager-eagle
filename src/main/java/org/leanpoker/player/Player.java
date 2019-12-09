@@ -3,6 +3,7 @@ package org.leanpoker.player;
 import com.google.gson.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -10,23 +11,118 @@ public class Player {
 
     private static Gson gson = new Gson();
 
-    static final String VERSION = "1.1.2";
+    static final String VERSION = "1.2.0";
 
     public static int betRequest(JsonElement request) {
 
         JsonObject jsonObject = request.getAsJsonObject();
 
+        int currentBuyIn = jsonObject.get("current_buy_in").getAsInt();
+        int currentPot = jsonObject.get("pot").getAsInt();
+        int round = jsonObject.get("round").getAsInt();
+        int minimumRaise = jsonObject.get("minimum_raise").getAsInt();
+
+        JsonArray communityCards = jsonObject.get("community_cards").getAsJsonArray();
+
         int inAction = jsonObject.get("in_action").getAsInt();
-        JsonElement self = jsonObject.get("players").getAsJsonArray().get(inAction);
-        JsonArray cards = self.getAsJsonObject().get("hole_cards").getAsJsonArray();
+        JsonObject self = jsonObject.get("players").getAsJsonArray().get(inAction).getAsJsonObject();
+        JsonArray cards = self.get("hole_cards").getAsJsonArray();
+
         JsonObject[] selfCards = new JsonObject[2];
+
         for (int i = 0; i < selfCards.length; i++) {
             selfCards[i] = cards.get(i).getAsJsonObject();
         }
 
+        int selfBet = self.get("bet").getAsInt();
 
+        if (checkPair(selfCards)) {
+            if (getHighestInHand(selfCards) >= 10) {
+                if (currentBuyIn <= 80) {
+                    return currentBuyIn - selfBet + minimumRaise + 100;
+                } else {
+                    return currentBuyIn;
+                }
+            } else {
+                if (currentBuyIn <= 80) {
+                    return currentBuyIn;
+                } else {
+                    return 0;
+                }
+            }
+        } else {
+            if (getHighestInHand(selfCards) >= 10) {
+                if (currentBuyIn <= 50) {
+                    return currentBuyIn;
+                } else {
+                    return 0;
+                }
+            } else {
+                return 0;
+            }
+        }
+}
 
+    public static void showdown(JsonElement game) {
+    }
 
+    public static boolean checkPair(JsonObject[] selfHand) {
+        return selfHand[0].get("rank").equals(selfHand[1].get("rank"));
+    }
+
+    public static int getHighestInHand(JsonObject[] selfHand) {
+        List<Integer> cardsList = new ArrayList<>();
+        for (JsonObject card : selfHand) {
+            int value;
+            switch (card.get("rank").getAsString()) {
+                case "J":
+                    value = 11;
+                    break;
+                case "Q":
+                    value = 12;
+                    break;
+                case "K":
+                    value = 13;
+                    break;
+                case "A":
+                    value = 14;
+                default:
+                    value = card.get("rank").getAsInt();
+            }
+            cardsList.add(value);
+        }
+
+        return Collections.max(cardsList);
+    }
+
+    public static int firstRound(int round, int selfBet, int currentBuyIn, int minimumRaise, JsonObject[] selfCards) {
+        if (round == 0) {
+            if (checkPair(selfCards)) {
+                if (getHighestInHand(selfCards) >= 10) {
+                    if (currentBuyIn <= 80) {
+                        return currentBuyIn - selfBet + minimumRaise + 100;
+                    } else {
+                        return currentBuyIn;
+                    }
+                } else {
+                    if (currentBuyIn <= 80) {
+                        return currentBuyIn;
+                    } else {
+                        return 0;
+                    }
+                }
+            } else {
+                if (getHighestInHand(selfCards) >= 10) {
+                    if (currentBuyIn <= 50) {
+                        return currentBuyIn;
+                    } else {
+                        return 0;
+                    }
+                } else {
+                    return 0;
+                }
+            }
+        }
         return 0;
     }
 
@@ -46,7 +142,7 @@ public class Player {
                 "  \"small_blind\": 10,                              // The small blind in the current round. The big blind is twice the\n" +
                 "                                                  //     small blind\n" +
                 "\n" +
-                "  \"current_buy_in\": 320,                          // The amount of the largest current bet from any one player\n" +
+                "  \"current_buy_in\": 50,                          // The amount of the largest current bet from any one player\n" +
                 "\n" +
                 "  \"pot\": 400,                                     // The size of the pot (sum of the player bets)\n" +
                 "\n" +
@@ -126,11 +222,8 @@ public class Player {
                 "}";
 
 
-        Player.betRequest(new JsonParser().parse(jsonString));
+        System.out.println(Player.betRequest(new JsonParser().parse(jsonString)));
 
 
-    }
-
-    public static void showdown(JsonElement game) {
     }
 }
