@@ -9,7 +9,7 @@ public class Player {
 
     private static Gson gson = new Gson();
 
-    static final String VERSION = "1.4.5a";
+    static final String VERSION = "1.4.6";
 
     public static int betRequest(JsonElement request) {
 
@@ -40,9 +40,17 @@ public class Player {
             allCards.add(card.getAsJsonObject());
         }
 
+        // LOGIC STARTS HERE ------------------------------------------------------------------
+
         if (allCards.size() > 2) {
-           if (countSameSuit(allCards) >= 5) {
+           if (countSameValues(selfCards, allCards) == 4) {
                return selfStack;
+           } else if (countSameSuit(allCards) >= 5) {
+               return selfStack;
+           } else if (countSameValues(selfCards, allCards) == 3) {
+               return selfStack / 4;
+           }else if (countSameValues(selfCards, allCards) == 2 && currentBuyIn < 75) {
+               return currentBuyIn - selfBet;
            }
         }
 
@@ -77,6 +85,20 @@ public class Player {
 
     public static void showdown(JsonElement game) {
 
+    }
+
+    public static int countSameValues(JsonObject[] selfHand, List<JsonObject> allCards) {
+        int max = 0;
+        for (JsonObject ownCard : selfHand) {
+            int counter = 0;
+            for (JsonObject card : allCards) {
+                if (ownCard.get("rank").getAsString().equals(card.get("rank").getAsString())) {
+                    counter++;
+                }
+            }
+            if (counter > max) max = counter;
+        }
+        return max;
     }
 
     public static boolean checkPair(JsonObject[] selfHand) {
