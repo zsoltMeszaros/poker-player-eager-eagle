@@ -24,6 +24,7 @@ public class Player {
         int inAction = jsonObject.get("in_action").getAsInt();
         JsonObject self = jsonObject.get("players").getAsJsonArray().get(inAction).getAsJsonObject();
         JsonArray cards = self.get("hole_cards").getAsJsonArray();
+        int selfStack = self.get("stack").getAsInt();
 
         JsonObject[] selfCards = new JsonObject[2];
 
@@ -38,8 +39,8 @@ public class Player {
             allCards.add(card.getAsJsonObject());
         }
 
-        if (checkPair(selfCards) && getHighestInHand(selfCards) > 10) {
-            return currentBuyIn - selfBet;
+        if (checkPair(selfCards) && getHighestInHand(selfCards) > 11) {
+            return selfStack;
         }
 
         return 0;
