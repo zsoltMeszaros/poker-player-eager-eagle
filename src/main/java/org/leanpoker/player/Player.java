@@ -9,7 +9,7 @@ public class Player {
 
     private static Gson gson = new Gson();
 
-    static final String VERSION = "1.4.6";
+    static final String VERSION = "2.0";
 
     public static int betRequest(JsonElement request) {
 
@@ -61,7 +61,7 @@ public class Player {
         }
 
         if (checkPair(selfCards) && getHighestInHand(getHandsValueList(selfCards)) > 11) {
-            return selfStack;
+            return currentBuyIn - selfBet + 100;
         }
 
         if (checkMatchingSuit(selfCards) && currentBuyIn <= 100) {
