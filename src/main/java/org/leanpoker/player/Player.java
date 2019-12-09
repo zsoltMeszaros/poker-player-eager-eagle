@@ -234,6 +234,5 @@ public class Player {
 
         System.out.println(Player.betRequest(new JsonParser().parse(jsonString)));
 
-
     }
 }
